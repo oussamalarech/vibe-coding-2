@@ -1,63 +1,248 @@
 <!DOCTYPE html>
-<html>
-<head>
-<style>
-.pricing {
-width: 300px;
-margin: auto;
-background-color: #fff;
-box-shdow: 0 0 10px #ccc;
-padding: 10px;
-text-align: left;
-}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pricing Card Demo</title>
 
-.title {
-font-size: 22px;
-font-weight: bold;
-}
+    <!-- Tailwind CSS via CDN for optimized, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            boxShadow: {
+              card: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+            },
+          },
+        },
+      };
+    </script>
 
-.price {
-font-size: 18px;
-color: green;
-}
+    <!-- React + ReactDOM + PropTypes via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/prop-types@15/prop-types.min.js"></script>
 
-.features {
-list-style: none;
-padding-left: 0;
-}
+    <!-- Babel for in-browser JSX transform (for demo only) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body class="bg-gray-50 antialiased">
+    <main id="root" class="min-h-screen py-10 px-4"></main>
 
-.features li {
-padding: 4px;
-border-bottom: 1px solid #eee;
-}
+    <script type="text/babel">
+      const { memo, useMemo, useCallback } = React;
 
-.btn {
-background: blue;
-color: white;
-padding: 10px 20px;
-border: none;
-margin-top: 10px;
-}
+      /**
+       * PricingCard
+       *
+       * A reusable, accessible, and responsive pricing card.
+       *
+       * Props
+       * @typedef {Object} PricingCardProps
+       * @property {string} title - Plan title (required)
+       * @property {number|string} price - Price amount (required)
+       * @property {string} [currency="$"] - Currency symbol
+       * @property {string} [period="/month"] - Billing period label
+       * @property {string[]} features - List of feature strings (required)
+       * @property {string} [ctaLabel="Get started"] - CTA button label
+       * @property {function} [onCtaClick] - Click handler for CTA button
+       * @property {boolean} [highlighted=false] - Emphasize the card visually
+       * @property {string} [badge] - Optional small badge text above the title
+       * @property {string} [className] - Additional class names
+       * @property {string} [id] - Optional id for accessibility hooks
+       */
 
-.btn:hover {
-background: darkblue;
-}
-</style>
-</head>
-<body>
+       /**
+        * @param {PricingCardProps} props
+        */
+      const PricingCard = memo(function PricingCard(props) {
+        const {
+          title,
+          price,
+          currency = "$",
+          period = "/month",
+          features,
+          ctaLabel = "Get started",
+          onCtaClick,
+          highlighted = false,
+          badge,
+          className = "",
+          id,
+        } = props;
 
-<div class="pricing">
-<h2 class="title">Basic Plan<h2>
-<p class="price">$9.99 /month</p>
+        const titleId = useMemo(() => (id ? `${id}-title` : `card-title-${Math.random().toString(36).slice(2)}`), [id]);
 
-<ul class="features">
-<li>1 GB Storage</li>
-<li>Basic Support</li>
-<li>All Core Features</li>
-</ul>
+        const hasValidTitle = typeof title === "string" && title.trim().length > 0;
+        const hasValidFeatures = Array.isArray(features) && features.length > 0;
+        const hasValidPrice = typeof price === "number" || (typeof price === "string" && price.toString().trim().length > 0);
 
-<button class="btn">Start Trial</button>
-</div>
+        if (!hasValidTitle || !hasValidFeatures || !hasValidPrice) {
+          if (typeof console !== "undefined" && console.warn) {
+            console.warn("PricingCard: Missing or invalid required props.", { title, price, features });
+          }
+          return (
+            <div
+              role="alert"
+              className={`w-full max-w-sm rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 ${className}`}
+            >
+              Unable to display plan. Some data is missing.
+            </div>
+          );
+        }
 
-</body>
+        const containerClasses = [
+          "w-full max-w-sm rounded-2xl border bg-white p-6 shadow-card transition-transform",
+          highlighted ? "ring-2 ring-blue-600 scale-[1.01]" : "border-gray-200",
+          "hover:translate-y-[-2px]",
+          className,
+        ].join(" ");
+
+        return (
+          <article
+            aria-labelledby={titleId}
+            className={containerClasses}
+          >
+            {badge ? (
+              <div className="mb-2 inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+                {badge}
+              </div>
+            ) : null}
+
+            <h3 id={titleId} className="text-xl font-semibold text-gray-900 break-words">
+              {title}
+            </h3>
+
+            <div className="mt-2 flex items-baseline gap-1 text-gray-900">
+              <span className="text-3xl font-bold">
+                {typeof price === "number" ? `${currency}${price}` : `${currency}${price}`}
+              </span>
+              <span className="text-sm text-gray-500">{period}</span>
+            </div>
+
+            <ul role="list" className="mt-4 space-y-2">
+              {features.map((feature, index) => (
+                <li key={`${feature}-${index}`} className="flex items-start gap-2 text-sm text-gray-700">
+                  <svg
+                    className="mt-0.5 h-4 w-4 flex-none text-green-600"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="break-words">{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <button
+              type="button"
+              onClick={onCtaClick}
+              className="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {ctaLabel}
+            </button>
+          </article>
+        );
+      });
+
+      PricingCard.propTypes = {
+        title: PropTypes.string.isRequired,
+        price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+        currency: PropTypes.string,
+        period: PropTypes.string,
+        features: PropTypes.arrayOf(PropTypes.string).isRequired,
+        ctaLabel: PropTypes.string,
+        onCtaClick: PropTypes.func,
+        highlighted: PropTypes.bool,
+        badge: PropTypes.string,
+        className: PropTypes.string,
+        id: PropTypes.string,
+      };
+
+      function App() {
+        const plans = useMemo(
+          () => [
+            {
+              id: "basic",
+              badge: "Most Affordable",
+              title: "Basic Plan",
+              price: 9.99,
+              period: "/month",
+              features: ["1 GB Storage", "Basic Support", "Core Features"],
+              ctaLabel: "Start Trial",
+              highlighted: false,
+            },
+            {
+              id: "pro",
+              badge: "Popular",
+              title: "Pro Plan",
+              price: 19.99,
+              period: "/month",
+              features: ["10 GB Storage", "Priority Support", "Advanced Analytics", "Team Seats"],
+              ctaLabel: "Choose Pro",
+              highlighted: true,
+            },
+            {
+              id: "enterprise",
+              title: "Enterprise",
+              price: "Contact",
+              period: "",
+              features: ["Unlimited Storage", "Dedicated Manager", "SLA & SSO"],
+              ctaLabel: "Contact Sales",
+              highlighted: false,
+            },
+          ],
+          []
+        );
+
+        const handleSelect = useCallback((planId) => {
+          alert(`Selected plan: ${planId}`);
+        }, []);
+
+        const clickHandlersById = useMemo(() => {
+          const entries = plans.map((p) => [p.id, () => handleSelect(p.id)]);
+          return Object.fromEntries(entries);
+        }, [plans, handleSelect]);
+
+        return (
+          <div className="mx-auto max-w-6xl">
+            <header className="mb-8 text-center">
+              <h1 className="text-2xl font-bold text-gray-900">Pricing</h1>
+              <p className="mt-1 text-sm text-gray-600">Pick a plan that fits your needs.</p>
+            </header>
+
+            <section
+              aria-label="Pricing Plans"
+              className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {plans.map((plan) => (
+                <PricingCard
+                  key={plan.id}
+                  id={plan.id}
+                  badge={plan.badge}
+                  title={plan.title}
+                  price={plan.price}
+                  period={plan.period}
+                  features={plan.features}
+                  ctaLabel={plan.ctaLabel}
+                  highlighted={plan.highlighted}
+                  onCtaClick={clickHandlersById[plan.id]}
+                />
+              ))}
+            </section>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
 </html>
