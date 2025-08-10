@@ -1,0 +1,247 @@
+/* CSS Custom Properties for theming */
+:root {
+  --card-bg: #ffffff;
+  --card-border: #e1e5e9;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-accent: #059669;
+  
+  --button-primary: #3b82f6;
+  --button-primary-hover: #2563eb;
+  --button-disabled: #9ca3af;
+  
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  --border-radius: 0.5rem;
+  --transition: all 0.2s ease-in-out;
+}
+
+/* Base Card Styles */
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  padding: var(--spacing-lg);
+  transition: var(--transition);
+  max-width: 100%;
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Card Variants */
+.card--featured {
+  border-color: var(--button-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.card--featured::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--button-primary);
+}
+
+.card--minimal {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.card--minimal:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.card--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.card--disabled:hover {
+  box-shadow: var(--card-shadow);
+  transform: none;
+}
+
+/* Card Header */
+.card__header {
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.card__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.2;
+}
+
+.card__price {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-accent);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Card Features */
+.card__features {
+  flex: 1;
+  margin-bottom: var(--spacing-lg);
+}
+
+.card__features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card__feature {
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--card-border);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  position: relative;
+  padding-left: var(--spacing-lg);
+}
+
+.card__feature::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--text-accent);
+  font-weight: bold;
+}
+
+.card__feature:last-child {
+  border-bottom: none;
+}
+
+/* Card Footer */
+.card__footer {
+  margin-top: auto;
+  text-align: center;
+}
+
+.card__button {
+  background: var(--button-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  width: 100%;
+  min-height: 44px; /* Accessibility: minimum touch target size */
+}
+
+.card__button:hover:not(:disabled) {
+  background: var(--button-primary-hover);
+  transform: translateY(-1px);
+}
+
+.card__button:focus {
+  outline: 2px solid var(--button-primary);
+  outline-offset: 2px;
+}
+
+.card__button:disabled {
+  background: var(--button-disabled);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive Design - Mobile First */
+@media (min-width: 640px) {
+  .card {
+    padding: var(--spacing-xl);
+    min-height: 350px;
+  }
+  
+  .card__title {
+    font-size: 1.75rem;
+  }
+  
+  .card__price {
+    font-size: 1.5rem;
+  }
+  
+  .card__feature {
+    font-size: 1rem;
+  }
+  
+  .card__button {
+    font-size: 1rem;
+    padding: var(--spacing-md) var(--spacing-xl);
+  }
+}
+
+@media (min-width: 768px) {
+  .card {
+    max-width: 320px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card {
+    max-width: 350px;
+    padding: var(--spacing-xl);
+  }
+  
+  .card__title {
+    font-size: 2rem;
+  }
+  
+  .card__price {
+    font-size: 1.75rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card {
+    border-width: 2px;
+  }
+  
+  .card__button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card__button {
+    transition: none;
+  }
+  
+  .card:hover {
+    transform: none;
+  }
+  
+  .card__button:hover:not(:disabled) {
+    transform: none;
+  }
+} 
